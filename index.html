@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Kwata – assistant de livraison sur WhatsApp pour le Cameroun (concept)">
+<title>Kwata</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: sticky language bar, hero with a hand-drawn landmark route, then one long scroll; the demo pairs a phone with its step list. */
+:root {
+  --paper: #F1F4EF;
+  --card: #FFFFFF;
+  --ink: #13241D;
+  --muted: #536359;
+  --line: #D3DCD5;
+  --forest: #0F4D36;
+  --forest-ink: #FFFFFF;
+  --saffron: #E3A30B;
+  --saffron-ink: #2E2100;
+  --band: #0F3B2A;
+  --band-fg: #EAF3EC;
+  --band-muted: #A9C2B3;
+  --street: #C9D3CB;
+  --frame: #0B1310;
+  --chat-bg: #E5ECE4;
+  --chat-head: #0F4D36;
+  --chat-head-fg: #F4FAF5;
+  --bubble-in: #FFFFFF;
+  --bubble-out: #D6EFCD;
+  --sys-bg: #FBF0CC;
+  --sys-fg: #4A3800;
+  --good: #1E7A4C;
+  --good-bg: #DDF1E4;
+  --pay: #8A5A00;
+  --pay-bg: #FCEFC9;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0C1411; --card: #131E19; --ink: #E4EDE7; --muted: #9AABA1; --line: #24332C;
+    --forest: #5CC497; --forest-ink: #06140E; --saffron: #F2B92A; --saffron-ink: #221800;
+    --band: #102A20; --band-fg: #E4EDE7; --band-muted: #9DB7A8; --street: #2A3A33;
+    --frame: #000000; --chat-bg: #0E1915; --chat-head: #16302A; --chat-head-fg: #E4EDE7;
+    --bubble-in: #1B2924; --bubble-out: #1E4A36; --sys-bg: #3A3013; --sys-fg: #F5DE95;
+    --good: #7FD8A8; --good-bg: #173527; --pay: #F2C35A; --pay-bg: #3A2E10;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0C1411; --card: #131E19; --ink: #E4EDE7; --muted: #9AABA1; --line: #24332C;
+  --forest: #5CC497; --forest-ink: #06140E; --saffron: #F2B92A; --saffron-ink: #221800;
+  --band: #102A20; --band-fg: #E4EDE7; --band-muted: #9DB7A8; --street: #2A3A33;
+  --frame: #000000; --chat-bg: #0E1915; --chat-head: #16302A; --chat-head-fg: #E4EDE7;
+  --bubble-in: #1B2924; --bubble-out: #1E4A36; --sys-bg: #3A3013; --sys-fg: #F5DE95;
+  --good: #7FD8A8; --good-bg: #173527; --pay: #F2C35A; --pay-bg: #3A2E10;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.015em; }
+h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.08; font-weight: 800; }
+h3 { font-size: 1.2rem; line-height: 1.25; font-weight: 600; }
+p { margin: 0; }
+code, .mono { font-family: var(--mono); }
+a { color: var(--forest); }
+:focus-visible { outline: 3px solid var(--saffron); outline-offset: 2px; border-radius: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.15rem; color: var(--muted); max-width: 62ch; }
+section { padding-block: 72px; }
+section + section { border-top: 1px solid var(--line); }
+.sechead { display: grid; gap: 12px; margin-bottom: 36px; }
+
+/* Top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 1.35rem; text-decoration: none; color: var(--ink); }
+.brand svg { width: 26px; height: 26px; flex: none; }
+.langs { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
+.langs button { font: 700 0.95rem var(--body); border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.langs button[aria-pressed="true"] { background: var(--forest); color: var(--forest-ink); }
+
+/* Hero */
+.hero { padding-block: 56px 64px; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(2.4rem, 5.6vw, 4.3rem); line-height: 1.0; font-weight: 800; margin-block: 14px 20px; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--saffron) 62%, var(--saffron) 92%, transparent 92%); }
+.hero .lead { margin-bottom: 26px; }
+.cta { display: inline-flex; align-items: center; gap: 10px; background: var(--forest); color: var(--forest-ink); font-weight: 700; text-decoration: none; padding: 13px 22px; border-radius: 999px; }
+.ctarow { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
+.asklink { font-weight: 700; color: var(--forest); text-decoration: underline; text-decoration-color: var(--saffron); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+.hero-note { margin-top: 22px; font-size: 0.95rem; color: var(--muted); max-width: 52ch; padding-left: 14px; border-left: 3px solid var(--saffron); }
+.routemap { width: 100%; max-width: 480px; justify-self: center; }
+.routemap svg { width: 100%; height: auto; display: block; }
+.routemap .street { stroke: var(--street); stroke-width: 10; fill: none; stroke-linecap: round; }
+.routemap .route { stroke: var(--saffron); stroke-width: 4; fill: none; stroke-dasharray: 2 10; stroke-linecap: round; animation: march 1.6s linear infinite; }
+.routemap .pin { fill: var(--forest); }
+.routemap .pinhole { fill: var(--paper); }
+.routemap .lbl { font: 700 14px var(--body); fill: var(--ink); }
+.routemap .lblbg { fill: var(--card); stroke: var(--line); }
+.routemap .num { font: 700 11px var(--mono); fill: var(--forest-ink); }
+.routemap .house { fill: var(--saffron); }
+.routemap .moto { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes march { to { stroke-dashoffset: -24; } }
+
+/* Problem */
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.prob { display: grid; gap: 10px; align-content: start; }
+.prob .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); display: grid; place-items: center; }
+.prob .ic svg { width: 24px; height: 24px; stroke: var(--forest); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.prob p { color: var(--muted); }
+
+/* Demo */
+.demo { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 48px; align-items: start; }
+.stage { display: grid; gap: 14px; justify-items: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); }
+.viewchip { font: 700 0.8rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; background: var(--sys-bg); color: var(--sys-fg); padding: 5px 12px; border-radius: 999px; }
+.phone { width: min(330px, 100%); border-radius: 40px; background: var(--frame); padding: 10px; box-shadow: 0 24px 48px -24px rgba(5, 25, 15, 0.45); }
+.screen { border-radius: 31px; overflow: hidden; background: var(--chat-bg); height: 580px; display: flex; flex-direction: column; }
+.chathead { display: flex; gap: 10px; align-items: center; padding: 14px 14px 12px; background: var(--chat-head); color: var(--chat-head-fg); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--saffron); color: var(--saffron-ink); display: grid; place-items: center; font: 800 1rem var(--display); flex: none; }
+.chathead b { display: block; font-size: 0.98rem; line-height: 1.2; }
+.chathead small { font-size: 0.75rem; opacity: 0.8; }
+.chatbody { flex: 1; overflow-y: auto; padding: 12px 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+.msg { max-width: 86%; padding: 7px 10px 18px; border-radius: 12px; position: relative; font-size: 14px; line-height: 1.4; color: var(--ink); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08); overflow-wrap: anywhere; }
+.msg.bot { align-self: flex-start; background: var(--bubble-in); border-top-left-radius: 4px; }
+.msg.me { align-self: flex-end; background: var(--bubble-out); border-top-right-radius: 4px; }
+.msg .tm { position: absolute; right: 8px; bottom: 3px; font-size: 11.5px; color: var(--muted); }
+.msg.sys { align-self: center; background: var(--sys-bg); color: var(--sys-fg); font-size: 12.5px; padding: 5px 12px; border-radius: 8px; box-shadow: none; font-weight: 700; }
+.msg.in { animation: msgin 0.28s ease-out; }
+@keyframes msgin { from { transform: translateY(8px); opacity: 0.2; } to { transform: none; opacity: 1; } }
+.map { width: 210px; max-width: 100%; height: 108px; border-radius: 8px; margin-bottom: 4px; position: relative; overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 46%, var(--street) 46%, var(--street) 54%, transparent 54%),
+    linear-gradient(0deg, transparent 38%, var(--street) 38%, var(--street) 46%, transparent 46%),
+    linear-gradient(120deg, transparent 70%, var(--street) 70%, var(--street) 75%, transparent 75%),
+    var(--chat-bg); }
+.map svg { position: absolute; left: 50%; top: 50%; width: 26px; height: 34px; transform: translate(-50%, -88%); }
+.map svg path { fill: var(--forest); }
+.map svg circle { fill: var(--bubble-in); }
+.loccap { font-size: 12.5px; font-weight: 700; }
+.loccap span { display: block; font: 500 12px var(--mono); color: var(--muted); }
+.voice { display: flex; align-items: center; gap: 8px; min-width: 190px; }
+.voice .play { width: 30px; height: 30px; border-radius: 50%; background: var(--forest); display: grid; place-items: center; flex: none; }
+.voice .play::after { content: ""; border-left: 10px solid var(--forest-ink); border-top: 6px solid transparent; border-bottom: 6px solid transparent; margin-left: 3px; }
+.wave { display: flex; align-items: center; gap: 2px; height: 26px; flex: 1; }
+.wave i { width: 3px; border-radius: 2px; background: var(--muted); }
+.voice .dur { font: 500 11px var(--mono); color: var(--muted); }
+.btnrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.btnrow span { flex: 1 1 auto; text-align: center; border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-weight: 700; font-size: 13px; color: var(--forest); background: var(--chat-bg); }
+.rcard { font-family: var(--mono); font-size: 12px; line-height: 1.55; }
+.rcard div:first-child { font-weight: 700; }
+.typing { align-self: flex-start; background: var(--bubble-in); border-radius: 12px; padding: 10px 14px; display: flex; gap: 4px; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: blink 1s infinite; }
+.typing i:nth-child(2) { animation-delay: 0.15s; } .typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.controls { display: flex; align-items: center; gap: 10px; }
+.controls button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+.controls button.main { width: auto; height: 50px; padding: 0 20px 0 16px; border-radius: 999px; display: flex; gap: 8px; font: 700 0.95rem var(--body); background: var(--forest); color: var(--forest-ink); border-color: var(--forest); }
+.controls svg { width: 20px; height: 20px; fill: currentColor; }
+.controls .stepof { font: 500 0.82rem var(--mono); color: var(--muted); min-width: 9ch; text-align: center; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; counter-reset: st; }
+.steps button { width: 100%; text-align: left; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid transparent; background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+.steps button > * { grid-column: 2; }
+.steps button::before { counter-increment: st; content: counter(st); grid-column: 1; grid-row: 1 / span 3; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font: 700 0.9rem var(--mono); color: var(--muted); }
+.steps button b { font-family: var(--display); font-weight: 600; font-size: 1.08rem; line-height: 1.3; }
+.steps button span { color: var(--muted); font-size: 0.97rem; }
+.steps button[aria-current="step"] { background: var(--card); border-color: var(--line); }
+.steps button[aria-current="step"]::before { background: var(--saffron); border-color: var(--saffron); color: var(--saffron-ink); }
+.steps .who { font: 700 0.8rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--forest); }
+
+/* Roles */
+.role { display: grid; gap: 10px; align-content: start; padding-top: 18px; border-top: 2px solid var(--ink); }
+.tag { justify-self: start; font: 700 0.78rem var(--mono); padding: 4px 10px; border-radius: 999px; }
+.tag.pay { background: var(--pay-bg); color: var(--pay); }
+.tag.free { background: var(--good-bg); color: var(--good); }
+.role p { color: var(--muted); }
+
+/* Address band */
+.band { background: var(--band); color: var(--band-fg); border-top: 0 !important; }
+.band + section { border-top: 0; }
+.band .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.band .eyebrow { color: var(--band-muted); }
+.band .lead { color: var(--band-muted); }
+.band .lead code { color: var(--saffron); font-weight: 700; }
+.bigcode { font: 700 clamp(2.6rem, 8vw, 5rem) var(--mono); color: var(--saffron); letter-spacing: 0.02em; line-height: 1; }
+.codebox { display: grid; gap: 14px; justify-items: start; }
+.codebox small { font-family: var(--mono); color: var(--band-muted); }
+.ticks { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 12px; }
+.ticks li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
+.ticks li::before { content: ""; width: 14px; height: 14px; margin-top: 6px; border-radius: 50%; border: 3px solid var(--saffron); }
+
+/* Safety */
+.safe { display: grid; gap: 10px; align-content: start; }
+.safe .ic { font: 700 1.6rem var(--mono); color: var(--forest); }
+.safe p { color: var(--muted); }
+.later { margin-top: 32px; color: var(--muted); max-width: 70ch; }
+
+/* Price */
+.pricegrid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 48px; align-items: start; }
+.tablebox { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font: 700 0.75rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td.n, th.n { text-align: right; }
+tbody tr:first-child td { color: var(--good); font-weight: 700; }
+.calc { font-size: 1.12rem; }
+.calc strong { background: linear-gradient(transparent 60%, var(--saffron) 60%); }
+.note { color: var(--muted); font-size: 0.95rem; margin-top: 14px; }
+.money { margin-top: 48px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.money p { color: var(--muted); }
+.money strong { color: var(--ink); }
+
+/* Roadmap */
+.road { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; counter-reset: rd; }
+.road li { display: grid; gap: 8px; align-content: start; position: relative; padding-top: 52px; }
+.road li::before { counter-increment: rd; content: counter(rd); position: absolute; top: 0; left: 0; width: 38px; height: 38px; border-radius: 50%; background: var(--card); border: 2px solid var(--forest); color: var(--forest); display: grid; place-items: center; font: 700 1rem var(--mono); }
+.road li:first-child::before { background: var(--saffron); border-color: var(--saffron); color: var(--saffron-ink); }
+.road li::after { content: ""; position: absolute; top: 19px; left: 46px; right: -16px; border-top: 2px dashed var(--line); }
+.road li:last-child::after { display: none; }
+.road .when { font: 700 0.78rem var(--mono); color: var(--forest); }
+.road p { color: var(--muted); }
+.roadnote { margin-top: 28px; color: var(--muted); }
+
+/* Team */
+.team { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.team div { display: grid; gap: 6px; align-content: start; }
+.team p { color: var(--muted); }
+.share { margin-top: 48px; display: grid; gap: 18px; }
+.share > p { max-width: 70ch; }
+.rows { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.rows .r { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto auto; gap: 8px 24px; align-items: baseline; padding-block: 14px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.rows .r b { font-family: var(--display); }
+.rows .r .c { color: var(--muted); font-family: var(--mono); font-size: 0.88rem; }
+.rows .r .v { font-weight: 700; text-align: right; }
+.rows .r .s { color: var(--good); font-weight: 700; text-align: right; }
+.warn { background: var(--pay-bg); color: var(--ink); border-radius: 12px; padding: 14px 18px; max-width: 70ch; }
+
+/* Ask */
+.askbox { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 4vw, 40px); display: grid; gap: 20px; }
+.askbox ol { margin: 0; padding-left: 1.4em; display: grid; gap: 12px; font-size: 1.12rem; }
+.askbox ol li::marker { font-family: var(--mono); color: var(--forest); font-weight: 700; }
+.copyrow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.copybtn { font: 700 0.95rem var(--body); border: 2px solid var(--forest); color: var(--forest); background: transparent; padding: 10px 18px; border-radius: 999px; cursor: pointer; }
+.copystate { color: var(--muted); font-size: 0.92rem; }
+
+/* FAQ */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 820px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; padding: 18px 0; font-family: var(--display); font-weight: 600; font-size: 1.12rem; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--mono); color: var(--forest); font-size: 1.3rem; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { padding-bottom: 18px; color: var(--muted); max-width: 70ch; }
+
+footer { padding-block: 36px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.92rem; }
+footer .wrap { display: grid; gap: 8px; }
+
+@media (max-width: 900px) {
+  .hero .wrap, .band .wrap, .pricegrid, .money { grid-template-columns: minmax(0, 1fr); }
+  .demo { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .stage { position: static; }
+  .three { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .road, .team { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .road li::after { display: none; }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  section { padding-block: 52px; }
+  .road, .team { grid-template-columns: minmax(0, 1fr); }
+  .rows .r { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .rows .r .v, .rows .r .s { text-align: left; }
+  th { white-space: normal; }
+  th, td { padding: 12px 6px; }
+  .screen { height: 540px; }
+  .langs button { padding: 6px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .routemap .route, .msg.in, .typing i { animation: none; }
+}
+</style>
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Kwata">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 1.5c-5 0-9 3.9-9 8.8 0 6.4 9 14.2 9 14.2s9-7.8 9-14.2c0-4.9-4-8.8-9-8.8z" fill="var(--forest)"/><circle cx="13" cy="10.3" r="3.6" fill="var(--saffron)"/></svg>
+      Kwata
+    </a>
+    <div class="langs" role="group" aria-label="Langue / Language">
+      <button type="button" id="lang-fr" data-lang="fr" aria-pressed="true">FR</button>
+      <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+      <button type="button" id="lang-pcm" data-lang="pcm" aria-pressed="false">Pidgin</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow" data-t="hero_kicker"></div>
+        <h1 data-t="hero_h"></h1>
+        <p class="lead" data-t="hero_p"></p>
+        <div class="ctarow">
+          <a class="cta" href="#demo" data-t="hero_cta"></a>
+          <a class="asklink" href="#ask" data-t="hero_ask"></a>
+        </div>
+        <p class="hero-note" data-t="hero_note"></p>
+      </div>
+      <div class="routemap" aria-hidden="true">
+        <svg viewBox="0 0 480 400">
+          <path class="street" d="M20 330 C 120 320, 200 300, 460 310"/>
+          <path class="street" d="M150 390 C 150 280, 160 160, 140 20"/>
+          <path class="street" d="M60 120 C 180 150, 300 170, 460 150"/>
+          <path class="street" d="M330 390 C 320 300, 330 200, 360 20"/>
+          <path class="route" d="M70 330 C 110 330, 145 320, 150 280 C 156 230, 150 190, 170 158 C 200 150, 260 166, 330 166 C 345 140, 352 110, 372 84"/>
+          <g transform="translate(46 314)">
+            <circle class="moto" cx="6" cy="22" r="7"/><circle class="moto" cx="38" cy="22" r="7"/>
+            <path class="moto" d="M6 22 L18 8 H30 L38 22 M18 8 L14 2 H8 M30 8 L34 2"/>
+          </g>
+          <g transform="translate(150 280)"><path class="pin" d="M0 0c-9-12-14-18-14-25a14 14 0 0 1 28 0c0 7-5 13-14 25z"/><text class="num" x="0" y="-21" text-anchor="middle">1</text></g>
+          <rect class="lblbg" x="168" y="246" width="128" height="26" rx="13"/>
+          <text class="lbl" x="232" y="264" text-anchor="middle" data-t="m_station"></text>
+          <g transform="translate(170 158)"><path class="pin" d="M0 0c-9-12-14-18-14-25a14 14 0 0 1 28 0c0 7-5 13-14 25z"/><text class="num" x="0" y="-21" text-anchor="middle">2</text></g>
+          <rect class="lblbg" x="20" y="166" width="118" height="26" rx="13"/>
+          <text class="lbl" x="79" y="184" text-anchor="middle" data-t="m_pharma"></text>
+          <g transform="translate(330 166)"><path class="pin" d="M0 0c-9-12-14-18-14-25a14 14 0 0 1 28 0c0 7-5 13-14 25z"/><text class="num" x="0" y="-21" text-anchor="middle">3</text></g>
+          <rect class="lblbg" x="250" y="182" width="160" height="26" rx="13"/>
+          <text class="lbl" x="330" y="200" text-anchor="middle" data-t="m_beignets"></text>
+          <g transform="translate(372 84)"><path class="house" d="M-18 0 V-22 L0 -38 L18 -22 V0 Z"/><rect x="-6" y="-14" width="12" height="14" fill="var(--forest)"/></g>
+          <rect class="lblbg" x="320" y="94" width="120" height="26" rx="13"/>
+          <text class="lbl" x="380" y="112" text-anchor="middle" data-t="m_gate"></text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="prob_k"></div>
+        <h2 data-t="prob_h"></h2>
+      </div>
+      <div class="three">
+        <div class="prob">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19 L10 5 M14 5 L20 19 M12 7v2 M12 12v2 M12 17v2"/></svg></div>
+          <h3 data-t="p1_h"></h3><p data-t="p1_p"></p>
+        </div>
+        <div class="prob">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/><path d="M16 3l5 5M21 3l-5 5"/></svg></div>
+          <h3 data-t="p2_h"></h3><p data-t="p2_p"></p>
+        </div>
+        <div class="prob">
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="6" r="2.5"/><path d="M7.5 18H14a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6.5"/></svg></div>
+          <h3 data-t="p3_h"></h3><p data-t="p3_p"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="demo_k"></div>
+        <h2 data-t="demo_h"></h2>
+        <p class="lead" data-t="demo_p"></p>
+      </div>
+      <div class="demo">
+        <div class="stage">
+          <div class="viewchip" id="viewchip"></div>
+          <div class="phone" id="phone">
+            <div class="screen">
+              <div class="chathead">
+                <div class="avatar">K</div>
+                <div><b>Kwata</b><small data-t="chat_sub"></small></div>
+              </div>
+              <div class="chatbody" id="chatBody" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="controls">
+            <button type="button" id="btnPrev" data-ta="ctrl_prev"><svg viewBox="0 0 24 24"><path d="M15.5 5 8.5 12l7 7-1.6 1.6L5.3 12l8.6-8.6z"/></svg></button>
+            <button type="button" id="btnPlay" class="main"><svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg><span id="playText"></span></button>
+            <button type="button" id="btnNext" data-ta="ctrl_next"><svg viewBox="0 0 24 24"><path d="M8.5 5l7 7-7 7 1.6 1.6 8.6-8.6-8.6-8.6z"/></svg></button>
+            <span class="stepof" id="stepOf"></span>
+          </div>
+        </div>
+        <ol class="steps" id="steps"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="roles">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="roles_k"></div>
+        <h2 data-t="roles_h"></h2>
+      </div>
+      <div class="three">
+        <div class="role"><h3 data-t="r_m_h"></h3><span class="tag pay" data-t="r_m_tag"></span><p data-t="r_m_p"></p></div>
+        <div class="role"><h3 data-t="r_c_h"></h3><span class="tag free" data-t="r_c_tag"></span><p data-t="r_c_p"></p></div>
+        <div class="role"><h3 data-t="r_k_h"></h3><span class="tag free" data-t="r_k_tag"></span><p data-t="r_k_p"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="address">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow" data-t="addr_k"></div>
+        <h2 data-t="addr_h" style="margin-block: 12px 18px"></h2>
+        <p class="lead" data-t="addr_p"></p>
+        <ul class="ticks">
+          <li data-t="addr_li1"></li>
+          <li data-t="addr_li2"></li>
+          <li data-t="addr_li3"></li>
+        </ul>
+      </div>
+      <div class="codebox">
+        <div class="bigcode">KW-4F7Q</div>
+        <small data-t="addr_small"></small>
+      </div>
+    </div>
+  </section>
+
+  <section id="safety">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="safe_k"></div>
+        <h2 data-t="safe_h"></h2>
+      </div>
+      <div class="three">
+        <div class="safe"><div class="ic">45 min</div><h3 data-t="s_ping_h"></h3><p data-t="s_ping_p"></p></div>
+        <div class="safe"><div class="ic">≤ 150 m</div><h3 data-t="s_gps_h"></h3><p data-t="s_gps_p"></p></div>
+        <div class="safe"><div class="ic">4821</div><h3 data-t="s_code_h"></h3><p data-t="s_code_p"></p></div>
+      </div>
+      <p class="later" data-t="safe_later"></p>
+    </div>
+  </section>
+
+  <section id="price">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="price_k"></div>
+        <h2 data-t="price_h"></h2>
+        <p class="lead" data-t="price_p"></p>
+      </div>
+      <div class="pricegrid">
+        <div class="tablebox">
+          <table>
+            <thead><tr><th data-t="th_pack"></th><th class="n" data-t="th_tokens"></th><th class="n" data-t="th_price"></th><th class="n" data-t="th_per"></th></tr></thead>
+            <tbody>
+              <tr><td data-t="pk1"></td><td class="n">10</td><td class="n" data-t="free"></td><td class="n">–</td></tr>
+              <tr><td data-t="pk2"></td><td class="n">30</td><td class="n" data-fcfa="7500"></td><td class="n" data-fcfa="250"></td></tr>
+              <tr><td data-t="pk3"></td><td class="n">100</td><td class="n" data-fcfa="20000"></td><td class="n" data-fcfa="200"></td></tr>
+              <tr><td data-t="pk4"></td><td class="n">500</td><td class="n" data-fcfa="75000"></td><td class="n" data-fcfa="150"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p class="calc" data-t="price_calc"></p>
+          <p class="note" data-t="price_note"></p>
+        </div>
+      </div>
+      <div class="money">
+        <div><h3 data-t="pay_h" style="margin-bottom:10px"></h3><p data-t="pay_p1"></p></div>
+        <div><h3 data-t="pay_h2" style="margin-bottom:10px"></h3><p data-t="pay_p2"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="road">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="road_k"></div>
+        <h2 data-t="road_h"></h2>
+      </div>
+      <ol class="road">
+        <li><span class="when" data-t="rd1_t"></span><h3 data-t="rd1_h"></h3><p data-t="rd1_p"></p></li>
+        <li><span class="when" data-t="rd2_t"></span><h3 data-t="rd2_h"></h3><p data-t="rd2_p"></p></li>
+        <li><span class="when" data-t="rd3_t"></span><h3 data-t="rd3_h"></h3><p data-t="rd3_p"></p></li>
+        <li><span class="when" data-t="rd4_t"></span><h3 data-t="rd4_h"></h3><p data-t="rd4_p"></p></li>
+      </ol>
+      <p class="roadnote" data-t="road_note"></p>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="team_k"></div>
+        <h2 data-t="team_h"></h2>
+      </div>
+      <div class="team">
+        <div><h3 data-t="t_j_h"></h3><p data-t="t_j_p"></p></div>
+        <div><h3 data-t="t_y_h"></h3><p data-t="t_y_p"></p></div>
+        <div><h3 data-t="t_d_h"></h3><p data-t="t_d_p"></p></div>
+        <div><h3 data-t="t_a_h"></h3><p data-t="t_a_p"></p></div>
+      </div>
+      <div class="share">
+        <h3 data-t="share_h"></h3>
+        <p data-t="share_p"></p>
+        <div class="rows">
+          <div class="r"><b data-t="sh_real"></b><span class="c" data-t="sh_real_c"></span><span class="v" data-t="sh_real_v"></span><span class="s" data-t="sh_real_s"></span></div>
+          <div class="r"><b data-t="sh_opt"></b><span class="c" data-t="sh_opt_c"></span><span class="v" data-t="sh_opt_v"></span><span class="s" data-t="sh_opt_s"></span></div>
+        </div>
+        <p class="warn" data-t="share_warn"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ask">
+    <div class="wrap">
+      <div class="askbox">
+        <div class="eyebrow" data-t="ask_k"></div>
+        <h2 data-t="ask_h"></h2>
+        <p class="lead" data-t="ask_p"></p>
+        <ol id="questions">
+          <li data-t="q1"></li>
+          <li data-t="q2"></li>
+          <li data-t="q3"></li>
+        </ol>
+        <p data-t="ask_after"></p>
+        <div class="copyrow">
+          <button type="button" class="copybtn" id="copyBtn" data-t="copy_btn"></button>
+          <span class="copystate" id="copyState" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="sechead">
+        <div class="eyebrow" data-t="faq_k"></div>
+        <h2 data-t="faq_h"></h2>
+      </div>
+      <div class="faq">
+        <details><summary data-t="f1_q"></summary><p data-t="f1_a"></p></details>
+        <details><summary data-t="f2_q"></summary><p data-t="f2_a"></p></details>
+        <details><summary data-t="f3_q"></summary><p data-t="f3_a"></p></details>
+        <details><summary data-t="f4_q"></summary><p data-t="f4_a"></p></details>
+        <details><summary data-t="f5_q"></summary><p data-t="f5_a"></p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p data-t="foot"></p>
+    <p data-t="pcm_note" id="pcmNote"></p>
+  </div>
+</footer>
+
+<script>
+const T = {
+fr: {
+  hero_kicker: "Concept · brouillon, novembre 2026",
+  hero_h: "Le livreur trouve le client <em>du premier coup.</em>",
+  hero_p: "Kwata est un assistant WhatsApp pour les vendeurs en ligne au Cameroun. Le client envoie sa position et explique le chemin par vocal, avec ses repères. Kwata en fait une fiche de route claire pour le livreur et vérifie que le client est bien là avant le départ.",
+  hero_cta: "Voir la démo",
+  hero_note: "Kwata n’emploie pas de livreurs. Kwata relie les vendeurs, leurs livreurs (privés ou d’une société) et les clients.",
+  m_station: "Station d’essence", m_pharma: "Pharmacie", m_beignets: "Vendeuse de beignets", m_gate: "Portail bleu",
+  prob_k: "Le problème",
+  prob_h: "Sans adresse, chaque livraison commence par des appels.",
+  p1_h: "Pas de nom de rue",
+  p1_p: "Le livreur appelle, cherche, demande aux voisins. Une livraison de 20 minutes peut prendre une heure.",
+  p2_h: "Le client ne répond plus",
+  p2_p: "Le livreur arrive, le client n’est pas là ou ne décroche pas. La course est perdue : 1 500 à 2 500 FCFA et une demi-journée.",
+  p3_h: "Les longues distances",
+  p3_p: "Douala ↔ Yaoundé : le colis part par une agence de voyage, puis un livreur le prend sur place. Si le client disparaît, la perte est encore plus grande.",
+  demo_k: "Démo",
+  demo_h: "Une livraison en 6 étapes",
+  demo_p: "Exemple d’une livraison à Yaoundé, vue tour à tour par la vendeuse, la cliente et le livreur. Les noms et numéros sont inventés.",
+  chat_sub: "Assistant de livraison",
+  v_merchant: "Vue de la vendeuse", v_customer: "Vue de la cliente", v_courier: "Vue du livreur",
+  ctrl_prev: "Étape précédente", ctrl_next: "Étape suivante", ctrl_play: "Lancer la démo", ctrl_pause: "Mettre en pause",
+  step_of: "Étape {n} / 6",
+  loc_label: "Position partagée",
+  btn_play: "Lecture", btn_pause: "Pause", example: "Exemple",
+  hero_ask: "Ce que j’attends de vous →",
+  sc1_h: "La vendeuse crée la livraison", sc1_p: "Nom, numéro, montant. Kwata écrit lui-même à la cliente.",
+  sc2_h: "La cliente envoie position et vocal", sc2_p: "Un vocal suffit, en français, anglais ou pidgin. Kwata répète ce qu’il a compris pour qu’elle vérifie.",
+  sc3_h: "Ping avant le départ", sc3_p: "Le livreur part seulement si la cliente confirme qu’elle est là.",
+  sc4_h: "Le livreur reçoit sa fiche de route", sc4_p: "Les repères dans l’ordre et un lien vers la carte. Il ne voit pas le numéro de la cliente.",
+  sc5_h: "Arrivée et code de remise", sc5_p: "Kwata compare la position du livreur avec celle de la cliente, puis la cliente donne son code.",
+  sc6_h: "Preuve de livraison, et la prochaine fois", sc6_p: "La vendeuse reçoit la confirmation. Au prochain achat, le code Kwata de la cliente suffit.",
+  roles_k: "Les rôles",
+  roles_h: "Qui fait quoi, qui paie",
+  r_m_h: "Vendeuse ou marchand", r_m_tag: "Paie avec des jetons",
+  r_m_p: "S’inscrit en une minute sur WhatsApp, crée les livraisons, invite ses livreurs. Les 10 premières livraisons sont offertes.",
+  r_c_h: "Client", r_c_tag: "Gratuit, sans inscription",
+  r_c_p: "Répond simplement aux messages : position, vocal, « je suis là », code.",
+  r_k_h: "Livreur", r_k_tag: "Gratuit",
+  r_k_p: "Privé ou d’une société de livraison. Reçoit fiche de route, ping et code sur WhatsApp. Aucune appli à installer.",
+  addr_k: "L’idée clé",
+  addr_h: "L’adresse Kwata",
+  addr_p: "Le client explique son chemin une seule fois. Il reçoit un code, par exemple <code>KW-4F7Q</code>. Ce code devient son adresse, chez tous les vendeurs qui utilisent Kwata.",
+  addr_li1: "Pour le client : enfin une adresse que tout livreur trouve.",
+  addr_li2: "Pour Kwata : plus il y a de codes, plus les vendeurs veulent Kwata, et inversement.",
+  addr_li3: "Enregistré seulement avec l’accord du client. Il peut le modifier ou le supprimer à tout moment.",
+  addr_small: "Aïcha · Biyem-Assi, Yaoundé",
+  safe_k: "Sécurité",
+  safe_h: "Trois contrôles contre les courses perdues",
+  s_ping_h: "Ping avant départ",
+  s_ping_p: "« Êtes-vous là dans les 45 minutes ? » Sans réponse en 10 minutes, le livreur ne part pas.",
+  s_gps_h: "Position à l’arrivée",
+  s_gps_p: "Le livreur envoie sa position. Kwata vérifie qu’il est à moins de 150 m du client.",
+  s_code_h: "Code de remise",
+  s_code_p: "Le client donne un code à 4 chiffres. C’est la preuve de livraison pour la vendeuse.",
+  safe_later: "Plus tard, pour les longues distances : un dépôt de garantie payé par le client par Mobile Money, libéré quand le colis est remis.",
+  price_k: "Prix",
+  price_h: "Seuls les marchands paient",
+  price_p: "1 jeton = 1 livraison réussie. Si le client annule au ping, aucun jeton n’est utilisé.",
+  th_pack: "Pack", th_tokens: "Jetons", th_price: "Prix (FCFA)", th_per: "Par livraison",
+  pk1: "Essai", pk2: "Petit commerce", pk3: "Boutique", pk4: "Grossiste", free: "gratuit",
+  price_calc: "Une course perdue coûte 1 500 à 2 500 FCFA. Un jeton coûte 150 à 250 FCFA. <strong>Une seule course sauvée paie donc 6 à 17 livraisons.</strong>",
+  price_note: "Prix de départ, à tester avec les premiers marchands. Les jetons restent valables 6 mois.",
+  pay_h: "L’argent des marchandises",
+  pay_p1: "<strong>Il ne passe pas par Kwata.</strong> Le client paie le marchand comme aujourd’hui, par Mobile Money ou en espèces à la livraison. Kwata note seulement « payé ».",
+  pay_h2: "L’achat des jetons",
+  pay_p2: "Par MTN Mobile Money ou Orange Money. <strong>Au début</strong>, sur le numéro du contact local, qui confirme le paiement. <strong>Plus tard</strong> automatiquement, via un prestataire de paiement agréé au Cameroun.",
+  road_k: "Feuille de route",
+  road_h: "Les étapes",
+  rd1_t: "2 à 3 semaines", rd1_h: "Test sans code", rd1_p: "Parler à 5 à 10 vendeuses. Le problème est-il assez fort ? Paieraient-elles ?",
+  rd2_t: "2 à 3 mois", rd2_h: "Bot WhatsApp de base", rd2_p: "Adresse par position et vocal, fiche de route, ping, code. Gratuit pendant la phase de test.",
+  rd3_t: "dès ~20 marchands", rd3_h: "Jetons et espace marchand", rd3_p: "Achat de jetons, page web pour suivre les livraisons. Déclarer une activité au Cameroun.",
+  rd4_t: "plus tard", rd4_h: "Paiements et longues distances", rd4_p: "Paiement dans Kwata, dépôt de garantie, trajets Douala ↔ Yaoundé par agence de voyage.",
+  road_note: "Jörg travaille à plein temps en Allemagne. Kwata se construit le soir et le week-end, étape par étape.",
+  team_k: "Équipe",
+  team_h: "Qui porte Kwata",
+  t_j_h: "Jörg, Allemagne", t_j_p: "La technique : le bot, la page web, l’IA. Répond par écrit sur WhatsApp (même heure en hiver, une heure d’écart en été).",
+  t_y_h: "Contact Yaoundé", t_y_p: "Les premiers marchands à Yaoundé, le point de contact local. Au début, il confirme les paiements de jetons.",
+  t_d_h: "Contact Douala", t_d_p: "Les premiers tests et les contacts avec des vendeuses à Douala.",
+  t_a_h: "Amies et connaissances", t_a_p: "Ambassadrices : elles font connaître Kwata, quand elles en ont envie.",
+  share_h: "Proposition de partage",
+  share_p: "Celui ou celle qui apporte un marchand reçoit <strong>30 % de ce que ce marchand paie en jetons, pendant 12 mois</strong>. Personne n’avance d’argent. Chaque contact reçoit un code de parrainage ; les 12 mois commencent au premier achat de jetons du marchand. Versement chaque mois par Mobile Money.",
+  sh_real: "Après un an, si ça marche", sh_real_c: "30 marchands actifs × 30 livraisons × 200 FCFA", sh_real_v: "180 000 FCFA / mois", sh_real_s: "dont 54 000 FCFA pour vous",
+  sh_opt: "Si ça marche très bien", sh_opt_c: "100 marchands × 50 livraisons × 200 FCFA", sh_opt_v: "1 000 000 FCFA / mois", sh_opt_s: "dont 300 000 FCFA pour vous",
+  share_warn: "Les premiers mois, Kwata ne rapporte presque rien. Mieux vaut le savoir dès le départ. Le calcul suppose que tous ces marchands ont été apportés par vous.",
+  ask_k: "Prochaine étape",
+  ask_h: "Ce dont j’ai besoin de vous",
+  ask_p: "Avant d’écrire une seule ligne de code : parlez à 5 à 10 vendeuses en ligne que vous connaissez. Trois questions suffisent.",
+  q1: "Combien de fois par semaine votre livreur cherche-t-il longtemps une adresse ?",
+  q2: "Combien de fois le client n’est-il pas là ou ne répond-il pas ?",
+  q3: "Paieriez-vous 200 FCFA par livraison si cela arrivait beaucoup moins souvent ?",
+  ask_after: "Notez les réponses et envoyez-les-moi sur WhatsApp. Si au moins 3 vendeuses répondent « oui, tout de suite », je construis le bot.",
+  copy_btn: "Copier les questions", copied: "Questions copiées.", copy_fail: "Texte sélectionné : copiez-le avec un appui long ou Ctrl+C.",
+  faq_k: "Questions",
+  faq_h: "Questions fréquentes",
+  f1_q: "Pourquoi WhatsApp et pas une application ?",
+  f1_a: "Au Cameroun, tout le monde a WhatsApp et les vendeurs y travaillent déjà. Une appli à télécharger ferait fuir les clients. Une page web pour les marchands viendra plus tard, une appli seulement si les marchands la demandent.",
+  f2_q: "Est-ce que ça fait sérieux ?",
+  f2_a: "Oui, c’est prévu : un compte WhatsApp Business vérifié au nom de Kwata, un logo, un site web, un reçu pour chaque achat de jetons et une vraie personne de contact sur place.",
+  f3_q: "Kwata embauche-t-il des livreurs ?",
+  f3_a: "Non. Les marchands utilisent leurs propres livreurs ou une société de livraison. Kwata fournit seulement l’outil.",
+  f4_q: "Et les données des clients ?",
+  f4_a: "Le livreur ne voit que le prénom et la fiche de route, jamais le numéro. Les vocaux seront effacés 24 h après la livraison. Kwata doit respecter la loi camerounaise de 2024 sur les données personnelles.",
+  f5_q: "Et le pidgin ?",
+  f5_a: "La reconnaissance vocale comprend bien le français et l’anglais. Pour le pidgin, elle s’améliorera avec le temps. Et le client vérifie toujours le résumé avant le départ du livreur.",
+  foot: "Kwata · concept de Jörg · novembre 2026. Les prix et les chiffres sont des hypothèses à vérifier.",
+  pcm_note: ""
+},
+en: {
+  hero_kicker: "Concept · draft, November 2026",
+  hero_h: "The courier finds the customer <em>on the first try.</em>",
+  hero_p: "Kwata is a WhatsApp assistant for online sellers in Cameroon. The customer sends their location and explains the way in a voice note, using local landmarks. Kwata turns it into a clear route card for the courier and checks that the customer is home before the courier leaves.",
+  hero_cta: "Watch the demo",
+  hero_note: "Kwata does not employ couriers. Kwata connects sellers, their couriers (private or from a company) and customers.",
+  m_station: "Petrol station", m_pharma: "Pharmacy", m_beignets: "Puff-puff seller", m_gate: "Blue gate",
+  prob_k: "The problem",
+  prob_h: "Without an address, every delivery starts with phone calls.",
+  p1_h: "No street names",
+  p1_p: "The courier calls, searches, asks the neighbours. A 20-minute delivery can take an hour.",
+  p2_h: "The customer stops answering",
+  p2_p: "The courier arrives and the customer isn’t there or doesn’t pick up. The trip is lost: 1,500 to 2,500 FCFA and half a day.",
+  p3_h: "Long distances",
+  p3_p: "Douala ↔ Yaoundé: the parcel goes by travel agency, then a local courier takes over. If the customer disappears, the loss is even bigger.",
+  demo_k: "Demo",
+  demo_h: "One delivery in 6 steps",
+  demo_p: "An example delivery in Yaoundé, seen in turn by the seller, the customer and the courier. Names and numbers are made up.",
+  chat_sub: "Delivery assistant",
+  v_merchant: "Seller’s view", v_customer: "Customer’s view", v_courier: "Courier’s view",
+  ctrl_prev: "Previous step", ctrl_next: "Next step", ctrl_play: "Play the demo", ctrl_pause: "Pause",
+  step_of: "Step {n} / 6",
+  loc_label: "Shared location",
+  btn_play: "Play", btn_pause: "Pause", example: "Example",
+  hero_ask: "What I need from you →",
+  sc1_h: "The seller creates the delivery", sc1_p: "Name, number, amount. Kwata writes to the customer by itself.",
+  sc2_h: "The customer sends location and voice note", sc2_p: "One voice note is enough, in French, English or Pidgin. Kwata repeats what it understood so she can check.",
+  sc3_h: "Ping before departure", sc3_p: "The courier only leaves once the customer confirms she is there.",
+  sc4_h: "The courier gets the route card", sc4_p: "Landmarks in order plus a map link. He never sees the customer’s number.",
+  sc5_h: "Arrival and handover code", sc5_p: "Kwata compares the courier’s location with the customer’s, then the customer gives her code.",
+  sc6_h: "Proof of delivery, and next time", sc6_p: "The seller gets the confirmation. Next time, the customer’s Kwata code is all it takes.",
+  roles_k: "Roles",
+  roles_h: "Who does what, who pays",
+  r_m_h: "Seller or shop", r_m_tag: "Pays with tokens",
+  r_m_p: "Signs up in one minute on WhatsApp, creates deliveries, invites their couriers. The first 10 deliveries are free.",
+  r_c_h: "Customer", r_c_tag: "Free, no sign-up",
+  r_c_p: "Simply replies to the messages: location, voice note, “I’m here”, code.",
+  r_k_h: "Courier", r_k_tag: "Free",
+  r_k_p: "Private or from a delivery company. Gets the route card, ping and code on WhatsApp. No app to install.",
+  addr_k: "The key idea",
+  addr_h: "The Kwata address",
+  addr_p: "The customer explains the way only once. They get a code, for example <code>KW-4F7Q</code>. That code becomes their address, with every seller who uses Kwata.",
+  addr_li1: "For the customer: finally an address any courier can find.",
+  addr_li2: "For Kwata: the more codes, the more sellers want Kwata, and the other way round.",
+  addr_li3: "Saved only with the customer’s consent. They can change or delete it at any time.",
+  addr_small: "Aïcha · Biyem-Assi, Yaoundé",
+  safe_k: "Safety",
+  safe_h: "Three checks against wasted trips",
+  s_ping_h: "Ping before departure",
+  s_ping_p: "“Will you be there in the next 45 minutes?” No answer within 10 minutes means the courier doesn’t leave.",
+  s_gps_h: "Location on arrival",
+  s_gps_p: "The courier sends his location. Kwata checks he is within 150 m of the customer.",
+  s_code_h: "Handover code",
+  s_code_p: "The customer gives a 4-digit code. That is the seller’s proof of delivery.",
+  safe_later: "Later, for long distances: a deposit paid by the customer via Mobile Money, released when the parcel is handed over.",
+  price_k: "Pricing",
+  price_h: "Only sellers pay",
+  price_p: "1 token = 1 successful delivery. If the customer cancels at the ping, no token is used.",
+  th_pack: "Pack", th_tokens: "Tokens", th_price: "Price (FCFA)", th_per: "Per delivery",
+  pk1: "Trial", pk2: "Small business", pk3: "Shop", pk4: "Wholesale", free: "free",
+  price_calc: "One wasted trip costs 1,500 to 2,500 FCFA. One token costs 150 to 250 FCFA. <strong>So a single saved trip pays for 6 to 17 deliveries.</strong>",
+  price_note: "Starting prices, to be tested with the first sellers. Tokens stay valid for 6 months.",
+  pay_h: "Money for the goods",
+  pay_p1: "<strong>It does not go through Kwata.</strong> The customer pays the seller as today, by Mobile Money or cash on delivery. Kwata only records “paid”.",
+  pay_h2: "Buying tokens",
+  pay_p2: "With MTN Mobile Money or Orange Money. <strong>At first</strong> to the local contact’s number, who confirms the payment. <strong>Later</strong> automatically, through a payment provider licensed in Cameroon.",
+  road_k: "Roadmap",
+  road_h: "The steps",
+  rd1_t: "2 to 3 weeks", rd1_h: "Test without code", rd1_p: "Talk to 5 to 10 sellers. Is the problem big enough? Would they pay?",
+  rd2_t: "2 to 3 months", rd2_h: "Basic WhatsApp bot", rd2_p: "Address by location and voice note, route card, ping, code. Free during the test phase.",
+  rd3_t: "from ~20 sellers", rd3_h: "Tokens and seller page", rd3_p: "Buying tokens, a web page to follow deliveries. Register a business in Cameroon.",
+  rd4_t: "later", rd4_h: "Payments and long distance", rd4_p: "Payment inside Kwata, deposits, Douala ↔ Yaoundé trips via travel agencies.",
+  road_note: "Jörg works full time in Germany. Kwata is built in the evenings and at weekends, one step at a time.",
+  team_k: "Team",
+  team_h: "Who carries Kwata",
+  t_j_h: "Jörg, Germany", t_j_p: "The technology: bot, web page, AI. Answers in writing on WhatsApp (same time in winter, one hour apart in summer).",
+  t_y_h: "Contact Yaoundé", t_y_p: "The first sellers in Yaoundé, the local point of contact. At first he confirms token payments.",
+  t_d_h: "Contact Douala", t_d_p: "First tests and contacts with sellers in Douala.",
+  t_a_h: "Friends and acquaintances", t_a_p: "Ambassadors: they spread the word about Kwata whenever they like.",
+  share_h: "Proposed revenue share",
+  share_p: "Whoever brings in a seller gets <strong>30% of what that seller pays for tokens, for 12 months</strong>. Nobody pays anything up front. Each contact gets a referral code; the 12 months start with the seller’s first token purchase. Paid out monthly by Mobile Money.",
+  sh_real: "After a year, if it works", sh_real_c: "30 active sellers × 30 deliveries × 200 FCFA", sh_real_v: "180,000 FCFA / month", sh_real_s: "of which 54,000 FCFA for you",
+  sh_opt: "If it works very well", sh_opt_c: "100 sellers × 50 deliveries × 200 FCFA", sh_opt_v: "1,000,000 FCFA / month", sh_opt_s: "of which 300,000 FCFA for you",
+  share_warn: "In the first months Kwata earns almost nothing. Better to know that from the start. The calculation assumes you brought in all of these sellers.",
+  ask_k: "Next step",
+  ask_h: "What I need from you",
+  ask_p: "Before writing a single line of code: talk to 5 to 10 online sellers you know. Three questions are enough.",
+  q1: "How many times a week does your courier spend a long time looking for an address?",
+  q2: "How many times is the customer not there or not answering?",
+  q3: "Would you pay 200 FCFA per delivery if that happened much less often?",
+  ask_after: "Write down the answers and send them to me on WhatsApp. If at least 3 sellers say “yes, right away”, I’ll build the bot.",
+  copy_btn: "Copy the questions", copied: "Questions copied.", copy_fail: "Text selected: copy it with a long press or Ctrl+C.",
+  faq_k: "Questions",
+  faq_h: "Frequently asked questions",
+  f1_q: "Why WhatsApp and not an app?",
+  f1_a: "In Cameroon everyone has WhatsApp and sellers already work there. An app to download would drive customers away. A web page for sellers comes later, an app only if sellers ask for one.",
+  f2_q: "Does it look serious?",
+  f2_a: "Yes, that is the plan: a verified WhatsApp Business account in Kwata’s name, a logo, a website, a receipt for every token purchase and a real contact person on the ground.",
+  f3_q: "Does Kwata hire couriers?",
+  f3_a: "No. Sellers use their own couriers or a delivery company. Kwata only provides the tool.",
+  f4_q: "What about customer data?",
+  f4_a: "The courier only sees the first name and the route card, never the number. Voice notes will be deleted 24 hours after delivery. Kwata has to comply with Cameroon’s 2024 personal data law.",
+  f5_q: "And Pidgin?",
+  f5_a: "Speech recognition understands French and English well. For Pidgin it will improve over time. And the customer always checks the summary before the courier leaves.",
+  foot: "Kwata · concept by Jörg · November 2026. Prices and figures are assumptions to be checked.",
+  pcm_note: ""
+},
+pcm: {
+  hero_kicker: "Concept · first draft, November 2026",
+  hero_h: "Driver go find customer <em>first time, no palava.</em>",
+  hero_p: "Kwata na WhatsApp helper for people weh dem di sell for online for Cameroon. Customer send yi location and talk the road for voice, with the landmark dem. Kwata turn am to clean road paper for the driver, and e check say customer de for house before driver commot.",
+  hero_cta: "See the demo",
+  hero_note: "Kwata no di employ driver. Kwata di join seller, yi driver (private or company) and the customer.",
+  m_station: "Petrol station", m_pharma: "Pharmacy", m_beignets: "Puff-puff woman", m_gate: "Blue gate",
+  prob_k: "The palava",
+  prob_h: "No address, so every delivery start with call, call, call.",
+  p1_h: "No street name",
+  p1_p: "Driver di call, di search, di ask neighbour dem. Delivery weh e suppose take 20 minutes fit take one hour.",
+  p2_h: "Customer no di pick call",
+  p2_p: "Driver reach, customer no de or e no di pick. The trip don lost: 1 500 to 2 500 FCFA and half day.",
+  p3_h: "Long distance",
+  p3_p: "Douala ↔ Yaoundé: parcel go with travel agency, then another driver carry am for there. If customer disappear, the loss big pass.",
+  demo_k: "Demo",
+  demo_h: "One delivery for 6 steps",
+  demo_p: "Example of one delivery for Yaoundé. You go see am from seller side, customer side and driver side. The names and number dem na invent.",
+  chat_sub: "Delivery helper",
+  v_merchant: "Seller side", v_customer: "Customer side", v_courier: "Driver side",
+  ctrl_prev: "Go back", ctrl_next: "Next step", ctrl_play: "Play the demo", ctrl_pause: "Stop small",
+  step_of: "Step {n} / 6",
+  loc_label: "Location weh I send",
+  btn_play: "Play", btn_pause: "Stop small", example: "Example",
+  hero_ask: "Wetin I need from wuna →",
+  sc1_h: "Seller create the delivery", sc1_p: "Name, number, how much. Kwata self go write the customer.",
+  sc2_h: "Customer send location and voice", sc2_p: "One voice message don do, for French, English or Pidgin. Kwata repeat wetin e hear make customer check am.",
+  sc3_h: "Ping before driver commot", sc3_p: "Driver go only commot when customer press say e de.",
+  sc4_h: "Driver get yi road paper", sc4_p: "Landmark dem one by one, plus map link. E no di see customer number.",
+  sc5_h: "Driver reach, customer give code", sc5_p: "Kwata compare driver location with customer location, then customer give yi code.",
+  sc6_h: "Proof of delivery, and next time", sc6_p: "Seller get the confirmation. Next time customer buy, yi Kwata code don do.",
+  roles_k: "Who be who",
+  roles_h: "Who di do wetin, who di pay",
+  r_m_h: "Seller or shop", r_m_tag: "E di pay with token",
+  r_m_p: "E register for one minute for WhatsApp, create delivery, invite yi driver dem. First 10 delivery na free.",
+  r_c_h: "Customer", r_c_tag: "Free, no register",
+  r_c_p: "E just answer the message dem: location, voice, «A de», code.",
+  r_k_h: "Driver", r_k_tag: "Free",
+  r_k_p: "Private driver or delivery company. E get road paper, ping and code for WhatsApp. No app for download.",
+  addr_k: "The big idea",
+  addr_h: "Kwata address",
+  addr_p: "Customer explain yi road only one time. E get code, like <code>KW-4F7Q</code>. That code turn yi address, for all seller weh dem di use Kwata.",
+  addr_li1: "For customer: finally address weh every driver fit find.",
+  addr_li2: "For Kwata: more code, more seller want Kwata. And more seller, more code.",
+  addr_li3: "We save am only if customer agree. E fit change or delete am any time.",
+  addr_small: "Aïcha · Biyem-Assi, Yaoundé",
+  safe_k: "Security",
+  safe_h: "Three check against lost trip",
+  s_ping_h: "Ping before go",
+  s_ping_p: "«You go de for house for the next 45 minutes?» If no answer for 10 minutes, driver no go commot.",
+  s_gps_h: "Location when driver reach",
+  s_gps_p: "Driver send yi location. Kwata check say e de less than 150 m from customer.",
+  s_code_h: "Handover code",
+  s_code_p: "Customer give code of 4 number. Na the proof of delivery for the seller.",
+  safe_later: "Later, for long distance: customer go pay small deposit with Mobile Money. E go free when the parcel reach yi hand.",
+  price_k: "Price",
+  price_h: "Na only seller di pay",
+  price_p: "1 token = 1 delivery weh e succeed. If customer cancel for the ping, no token go cut.",
+  th_pack: "Pack", th_tokens: "Token", th_price: "Price (FCFA)", th_per: "One delivery",
+  pk1: "Try am", pk2: "Small business", pk3: "Shop", pk4: "Wholesale", free: "free",
+  price_calc: "One lost trip cost 1 500 to 2 500 FCFA. One token cost 150 to 250 FCFA. <strong>So one trip weh you save pay for 6 to 17 delivery.</strong>",
+  price_note: "Start price, we go test am with the first seller dem. Token dem go last 6 months.",
+  pay_h: "Money for the goods",
+  pay_p1: "<strong>E no di pass for Kwata.</strong> Customer pay seller like today, with Mobile Money or cash for delivery. Kwata only write «paid».",
+  pay_h2: "How seller buy token",
+  pay_p2: "With MTN Mobile Money or Orange Money. <strong>For start</strong>, seller send money for the local contact number, and e confirm am. <strong>Later</strong> e go be automatic, with payment company weh get licence for Cameroon.",
+  road_k: "Road plan",
+  road_h: "The steps",
+  rd1_t: "2 to 3 weeks", rd1_h: "Test without code", rd1_p: "Talk with 5 to 10 online seller. The palava strong enough? Dem go pay?",
+  rd2_t: "2 to 3 months", rd2_h: "Simple WhatsApp bot", rd2_p: "Address with location and voice, road paper, ping, code. Free for the test time.",
+  rd3_t: "from ~20 seller", rd3_h: "Token and seller page", rd3_p: "Buy token, web page for follow delivery. Register business for Cameroon.",
+  rd4_t: "later", rd4_h: "Payment and long distance", rd4_p: "Pay inside Kwata, deposit, Douala ↔ Yaoundé with travel agency.",
+  road_note: "Jörg di work full time for Germany. We di build Kwata for evening and weekend, small small.",
+  team_k: "Team",
+  team_h: "Who di carry Kwata",
+  t_j_h: "Jörg, Germany", t_j_p: "Technical side: bot, web page, AI. E di answer for WhatsApp by writing (same time for winter, one hour difference for summer).",
+  t_y_h: "Contact Yaoundé", t_y_p: "First seller dem for Yaoundé, local contact. For start e confirm token payment.",
+  t_d_h: "Contact Douala", t_d_p: "First test, contact with online seller dem for Douala.",
+  t_a_h: "Friends and people weh we sabi", t_a_p: "Ambassador: dem di tell people about Kwata, when dem get time.",
+  share_h: "Share proposal",
+  share_p: "Anybody weh e bring one seller go get <strong>30 % of wetin that seller pay for token, for 12 months</strong>. Nobody go put money first. Every contact get yi own referral code; the 12 months start when the seller first buy token. We di pay every month with Mobile Money.",
+  sh_real: "After one year, if e work", sh_real_c: "30 active seller × 30 delivery × 200 FCFA", sh_real_v: "180 000 FCFA / month", sh_real_s: "54 000 FCFA na for you",
+  sh_opt: "If e work fine fine", sh_opt_c: "100 seller × 50 delivery × 200 FCFA", sh_opt_v: "1 000 000 FCFA / month", sh_opt_s: "300 000 FCFA na for you",
+  share_warn: "The first months, Kwata no go bring almost anything. Better we all know am from start. The calculation think say all these seller na wuna bring dem.",
+  ask_k: "Next step",
+  ask_h: "Wetin I need from wuna",
+  ask_p: "Before I write any code: talk with 5 to 10 online seller weh wuna sabi. Three question don do.",
+  q1: "How many times for one week your driver di search address for long time?",
+  q2: "How many times customer no de or e no di pick call?",
+  q3: "You go pay 200 FCFA for one delivery if this thing no go happen plenty again?",
+  ask_after: "Write the answer dem and send am for me for WhatsApp. If at least 3 seller talk «yes, now now», I go build the bot.",
+  copy_btn: "Copy the questions", copied: "Questions don copy.", copy_fail: "Text don select: copy am with long press or Ctrl+C.",
+  faq_k: "Questions",
+  faq_h: "Question weh people di ask",
+  f1_q: "Why WhatsApp and no app?",
+  f1_a: "For Cameroon everybody get WhatsApp, and seller dem di already work there. App for download go make customer run. Web page for seller go come later, app only if seller dem ask for am.",
+  f2_q: "E go look serious?",
+  f2_a: "Yes, na the plan: verified WhatsApp Business account with Kwata name, logo, website, receipt for every token, and real contact person for ground.",
+  f3_q: "Kwata di employ driver?",
+  f3_a: "No. Seller dem use dem own driver or delivery company. Kwata only give the tool.",
+  f4_q: "And customer data?",
+  f4_a: "Driver only see first name and road paper, never the number. Voice message dem go delete 24 hours after delivery. Kwata must follow Cameroon 2024 law for personal data.",
+  f5_q: "And Pidgin?",
+  f5_a: "Voice recognition understand French and English well. For Pidgin e go better with time. And customer always check the summary before driver commot.",
+  foot: "Kwata · concept by Jörg · November 2026. Price and number dem na guess, we go check dem.",
+  pcm_note: "Dis Pidgin na first try. If something no correct, tell Jörg make e change am."
+}
+};
+
+/* Demo scenes: f = sender (bot | me | sys), k = kind (text | loc | voice | btns | card) */
+const SC = [
+ { view: "v_merchant", h: "sc1_h", p: "sc1_p", start: [14, 2], msgs: [
+   { f: "me", k: "text", t: { fr: "Nouvelle livraison", en: "New delivery", pcm: "New delivery" } },
+   { f: "bot", k: "text", t: { fr: "Pour quel client ? Envoyez le nom, le numéro et le montant.", en: "Which customer? Send the name, number and amount.", pcm: "Which customer? Send name, number and how much." } },
+   { f: "me", k: "text", t: { fr: "Aïcha, 6•• •• •• 56, robe 12 500 FCFA à payer à la livraison, livreur : Paul", en: "Aïcha, 6•• •• •• 56, dress 12,500 FCFA cash on delivery, courier: Paul", pcm: "Aïcha, 6•• •• •• 56, gown 12 500 FCFA, she go pay when e reach, driver: Paul" } },
+   { f: "bot", k: "text", t: { fr: "✓ Message envoyé à Aïcha. Je vous préviens dès que son adresse est vérifiée.", en: "✓ Message sent to Aïcha. I’ll let you know as soon as her address is verified.", pcm: "✓ I don send message for Aïcha. I go tell you when yi address don correct." } }
+ ]},
+ { view: "v_customer", h: "sc2_h", p: "sc2_p", start: [14, 4], msgs: [
+   { f: "bot", k: "text", t: { fr: "Bonjour Aïcha ! Votre commande de Ngono Mode arrive.\n1. Partagez votre position 📍\n2. Expliquez le chemin en vocal 🎙️", en: "Hello Aïcha! Your order from Ngono Mode is on its way.\n1. Share your location 📍\n2. Explain the way in a voice note 🎙️", pcm: "Hello Aïcha! Yu order from Ngono Mode di come.\n1. Send yu location 📍\n2. Talk the road for voice 🎙️" } },
+   { f: "me", k: "loc", t: { fr: "Biyem-Assi, Yaoundé", en: "Biyem-Assi, Yaoundé", pcm: "Biyem-Assi, Yaoundé" } },
+   { f: "me", k: "voice", t: { fr: "0:24", en: "0:24", pcm: "0:24" } },
+   { f: "bot", k: "btns", t: { fr: "J’ai compris : Biyem-Assi, près de la station d’essence. Rue en face de la pharmacie, 200 m, à gauche après la vendeuse de beignets, portail bleu à droite. C’est correct ?", en: "I understood: Biyem-Assi, near the petrol station. Road opposite the pharmacy, 200 m, left after the puff-puff seller, blue gate on the right. Is that correct?", pcm: "I don hear: Biyem-Assi, near the petrol station. Road weh e face the pharmacy, 200 m, left after puff-puff woman, blue gate for right hand. Na so?" },
+     b: { fr: ["✅ Oui", "✏️ Corriger"], en: ["✅ Yes", "✏️ Correct it"], pcm: ["✅ Na so", "✏️ Change am"] } },
+   { f: "me", k: "text", t: { fr: "✅ Oui", en: "✅ Yes", pcm: "✅ Na so" } },
+   { f: "bot", k: "text", t: { fr: "Adresse enregistrée ✓ Votre code Kwata : KW-4F7Q. Gardez-le pour vos prochains achats.", en: "Address saved ✓ Your Kwata code: KW-4F7Q. Keep it for your next orders.", pcm: "Address don save ✓ Yu Kwata code na KW-4F7Q. Keep am for next time." } }
+ ]},
+ { view: "v_customer", h: "sc3_h", p: "sc3_p", start: [14, 15], msgs: [
+   { f: "bot", k: "btns", t: { fr: "Paul, le livreur de Ngono Mode, est prêt. Serez-vous là dans les 45 prochaines minutes ?", en: "Paul, the Ngono Mode courier, is ready. Will you be there in the next 45 minutes?", pcm: "Paul, Ngono Mode driver, don ready. You go de for house for the next 45 minutes?" },
+     b: { fr: ["🟢 Je suis là", "⏰ Plus tard", "❌ Annuler"], en: ["🟢 I’m here", "⏰ Later", "❌ Cancel"], pcm: ["🟢 A de", "⏰ Later", "❌ Cancel"] } },
+   { f: "me", k: "text", t: { fr: "🟢 Je suis là", en: "🟢 I’m here", pcm: "🟢 A de" } },
+   { f: "bot", k: "text", t: { fr: "Parfait ! Paul part maintenant 🏍️", en: "Great! Paul is leaving now 🏍️", pcm: "Fine! Paul di commot now 🏍️" } }
+ ]},
+ { view: "v_courier", h: "sc4_h", p: "sc4_p", start: [14, 16], msgs: [
+   { f: "bot", k: "text", t: { fr: "GO 🏍️ La cliente a confirmé.", en: "GO 🏍️ The customer has confirmed.", pcm: "GO 🏍️ Customer don confirm." } },
+   { f: "bot", k: "card", c: {
+     fr: ["🏍️ KWATA · #D-2291", "Biyem-Assi, Yaoundé", "📍 Q3V8+2X → ouvrir la carte", "1. Station d’essence → rue en face de la pharmacie", "2. 200 m, à gauche après la vendeuse de beignets", "3. Portail bleu, 3e maison à droite", "👤 Aïcha · 💰 12 500 FCFA à encaisser", "🔑 Code à demander à la remise"],
+     en: ["🏍️ KWATA · #D-2291", "Biyem-Assi, Yaoundé", "📍 Q3V8+2X → open map", "1. Petrol station → road opposite the pharmacy", "2. 200 m, left after the puff-puff seller", "3. Blue gate, 3rd house on the right", "👤 Aïcha · 💰 collect 12,500 FCFA", "🔑 Ask for the code at handover"],
+     pcm: ["🏍️ KWATA · #D-2291", "Biyem-Assi, Yaoundé", "📍 Q3V8+2X → open map", "1. Petrol station → road weh e face pharmacy", "2. 200 m, turn left after puff-puff woman", "3. Blue gate, house number 3 for right hand", "👤 Aïcha · 💰 collect 12 500 FCFA", "🔑 Ask code when you give the parcel"] } },
+   { f: "me", k: "text", t: { fr: "Ok, je suis en route", en: "Ok, on my way", pcm: "Ok, I di go" } }
+ ]},
+ { view: "v_courier", h: "sc5_h", p: "sc5_p", start: [14, 30], msgs: [
+   { f: "me", k: "loc", t: { fr: "Arrivé", en: "Arrived", pcm: "I don reach" } },
+   { f: "sys", k: "text", t: { fr: "Position vérifiée : 40 m de la cliente ✓", en: "Location checked: 40 m from the customer ✓", pcm: "Location correct: 40 m from customer ✓" } },
+   { f: "bot", k: "text", t: { fr: "Aïcha est prévenue. Demandez-lui son code.", en: "Aïcha has been notified. Ask her for the code.", pcm: "I don tell Aïcha. Ask am yi code." } },
+   { f: "me", k: "text", t: { fr: "4821", en: "4821", pcm: "4821" } },
+   { f: "bot", k: "text", t: { fr: "Livré ✓ Merci Paul ! N’oubliez pas d’encaisser 12 500 FCFA.", en: "Delivered ✓ Thanks Paul! Remember to collect 12,500 FCFA.", pcm: "Delivered ✓ Thank you Paul! No forget collect 12 500 FCFA." } }
+ ]},
+ { view: "v_merchant", h: "sc6_h", p: "sc6_p", start: [14, 32], msgs: [
+   { f: "bot", k: "text", t: { fr: "Livré ✓ #D-2291 à 14:32\nCode confirmé, position vérifiée.\n1 jeton utilisé, il vous en reste 9.", en: "Delivered ✓ #D-2291 at 14:32\nCode confirmed, location checked.\n1 token used, 9 left.", pcm: "Delivered ✓ #D-2291 for 14:32\nCode correct, location correct.\n1 token don cut, 9 remain." } },
+   { f: "sys", k: "text", t: { fr: "Une semaine plus tard", en: "One week later", pcm: "One week after" } },
+   { f: "me", k: "text", t: { fr: "Nouvelle livraison : KW-4F7Q, sac 8 000 FCFA", en: "New delivery: KW-4F7Q, bag 8,000 FCFA", pcm: "New delivery: KW-4F7Q, bag 8 000 FCFA" } },
+   { f: "bot", k: "text", t: { fr: "Adresse connue ✓ Aïcha, Biyem-Assi. Pas besoin de nouveau vocal. Je lui envoie seulement le ping.", en: "Known address ✓ Aïcha, Biyem-Assi. No new voice note needed. I’ll just send her the ping.", pcm: "I sabi this address ✓ Aïcha, Biyem-Assi. No need new voice. I go only send am the ping." } }
+ ]}
+];
+
+let lang = "fr";
+try { const s = localStorage.getItem("kwata-lang"); if (s && T[s]) lang = s; } catch (e) {}
+
+const $ = (s) => document.querySelector(s);
+const tx = (k) => (T[lang][k] ?? T.fr[k] ?? "");
+const pick = (o) => (o[lang] ?? o.fr);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const fmt = (n) => n.toLocaleString(lang === "en" ? "en-US" : "fr-FR");
+
+function applyLang() {
+  document.documentElement.lang = lang === "pcm" ? "wes" : lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { el.innerHTML = tx(el.dataset.t); });
+  document.querySelectorAll("[data-ta]").forEach((el) => { el.setAttribute("aria-label", tx(el.dataset.ta)); });
+  document.querySelectorAll("[data-fcfa]").forEach((el) => { el.textContent = fmt(Number(el.dataset.fcfa)); });
+  document.querySelectorAll(".langs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  $("#pcmNote").hidden = !tx("pcm_note");
+  $("#copyState").textContent = "";
+  buildSteps();
+  if (playing) play(cur); else renderStatic(cur);
+}
+
+document.querySelectorAll(".langs button").forEach((b) => b.addEventListener("click", () => {
+  lang = b.dataset.lang;
+  try { localStorage.setItem("kwata-lang", lang); } catch (e) {}
+  applyLang();
+}));
+
+/* ---- Demo player ---- */
+const chat = $("#chatBody");
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let cur = 0, playing = false, gen = 0;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function clock(scene, j) {
+  const m = scene.start[1] + Math.floor(j / 2);
+  return scene.start[0] + ":" + String(m).padStart(2, "0");
+}
+function waveBars() {
+  const h = [8, 14, 20, 12, 24, 16, 10, 22, 18, 9, 15, 23, 13, 19, 8, 17, 11, 21, 14, 9];
+  return h.map((v) => `<i style="height:${v}px"></i>`).join("");
+}
+function msgEl(m, scene, j) {
+  const d = document.createElement("div");
+  d.className = "msg " + m.f;
+  const tm = m.f === "sys" ? "" : `<span class="tm">${clock(scene, j)}${m.f === "me" ? " ✓✓" : ""}</span>`;
+  let inner = "";
+  if (m.k === "loc") {
+    inner = `<div class="map"><svg viewBox="0 0 26 34"><path d="M13 0C5.8 0 0 5.6 0 12.6 0 22 13 34 13 34s13-12 13-21.4C26 5.6 20.2 0 13 0z"/><circle cx="13" cy="12.5" r="5"/></svg></div><div class="loccap">${esc(tx("loc_label"))}<span>${esc(pick(m.t))} · 3.8352, 11.4851</span></div>`;
+  } else if (m.k === "voice") {
+    inner = `<div class="voice"><span class="play"></span><span class="wave">${waveBars()}</span><span class="dur">${esc(pick(m.t))}</span></div>`;
+  } else if (m.k === "card") {
+    inner = `<div class="rcard">${pick(m.c).map((l) => `<div>${esc(l)}</div>`).join("")}</div>`;
+  } else if (m.k === "btns") {
+    inner = esc(pick(m.t)).replace(/\n/g, "<br>") + `<div class="btnrow">${pick(m.b).map((b) => `<span>${esc(b)}</span>`).join("")}</div>`;
+  } else {
+    inner = esc(pick(m.t)).replace(/\n/g, "<br>");
+  }
+  d.innerHTML = inner + tm;
+  return d;
+}
+function scrollChat() { chat.scrollTop = chat.scrollHeight; }
+
+function updateUI() {
+  $("#viewchip").textContent = tx("example") + " · " + tx(SC[cur].view);
+  $("#stepOf").textContent = tx("step_of").replace("{n}", cur + 1);
+  document.querySelectorAll("#steps button").forEach((b, i) => {
+    if (i === cur) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+  });
+  $("#playText").textContent = tx(playing ? "btn_pause" : "btn_play");
+  $("#playIcon").innerHTML = playing ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+}
+function renderStatic(i) {
+  gen++; cur = i;
+  chat.innerHTML = "";
+  SC[i].msgs.forEach((m, j) => chat.append(msgEl(m, SC[i], j)));
+  updateUI(); scrollChat();
+}
+async function play(i) {
+  const g = ++gen; cur = i;
+  chat.innerHTML = "";
+  updateUI();
+  const sc = SC[i];
+  for (let j = 0; j < sc.msgs.length; j++) {
+    const m = sc.msgs[j];
+    if (m.f === "bot") {
+      const ty = document.createElement("div");
+      ty.className = "typing"; ty.innerHTML = "<i></i><i></i><i></i>";
+      chat.append(ty); scrollChat();
+      await wait(m.k === "card" ? 1200 : 850);
+      if (g !== gen) return;
+      ty.remove();
+    } else {
+      await wait(m.k === "voice" ? 1100 : 800);
+      if (g !== gen) return;
+    }
+    const e = msgEl(m, sc, j);
+    e.classList.add("in");
+    chat.append(e); scrollChat();
+    await wait(m.k === "card" ? 1800 : 650);
+    if (g !== gen) return;
+  }
+  await wait(3000);
+  if (g !== gen || !playing) return;
+  play((i + 1) % SC.length);
+}
+function setPlaying(p) {
+  playing = p;
+  if (p) play(cur); else renderStatic(cur);
+}
+function goTo(i) {
+  cur = (i + SC.length) % SC.length;
+  if (playing) play(cur); else renderStatic(cur);
+}
+function buildSteps() {
+  const ol = $("#steps");
+  ol.innerHTML = "";
+  SC.forEach((s, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button"; b.id = "step-" + (i + 1);
+    b.innerHTML = `<span class="who">${esc(tx(s.view))}</span><b>${esc(tx(s.h))}</b><span>${esc(tx(s.p))}</span>`;
+    b.addEventListener("click", () => goTo(i));
+    li.append(b); ol.append(li);
+  });
+}
+$("#btnPlay").addEventListener("click", () => setPlaying(!playing));
+$("#btnPrev").addEventListener("click", () => goTo(cur - 1));
+$("#btnNext").addEventListener("click", () => goTo(cur + 1));
+
+/* Start the demo once the phone scrolls into view */
+if (!reduced && "IntersectionObserver" in window) {
+  let done = false;
+  const io = new IntersectionObserver((ents) => {
+    if (!done && ents.some((e) => e.isIntersecting)) { done = true; io.disconnect(); setPlaying(true); }
+  }, { threshold: 0.5 });
+  io.observe($("#phone"));
+}
+
+/* ---- Copy questions ---- */
+$("#copyBtn").addEventListener("click", () => {
+  const text = ["q1", "q2", "q3"].map((k, i) => `${i + 1}. ${tx(k)}`).join("\n");
+  const fallback = () => {
+    const r = document.createRange(); r.selectNodeContents($("#questions"));
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    $("#copyState").textContent = tx("copy_fail");
+  };
+  try {
+    navigator.clipboard.writeText(text).then(() => { $("#copyState").textContent = tx("copied"); }, fallback);
+  } catch (e) { fallback(); }
+});
+
+applyLang();
+</script>
+</body>
+</html>
